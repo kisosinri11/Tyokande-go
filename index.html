@@ -371,13 +371,27 @@
     }
 
     /* スマホでキーボード表示中：ゲーム内容や動作は変えず、UIの間隔だけを圧縮 */
+    /* キーボード表示中は、ゲーム画面自体を表示領域の左上に固定する */
+    body.keyboard-open {
+      display: block;
+      width: 100%;
+      height: 100%;
+      inset: 0 auto auto 0;
+    }
     body.keyboard-open #game-container {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      max-width: none;
       max-height: none;
+      margin: 0;
     }
     body.keyboard-open .ui-layer {
       padding: 6px;
-      /* キーボード表示中は、中央・下部に置かれていたUIを上側へ寄せる */
+      /* 上からヘッダー→問題表示→回答欄の順に並べる */
       justify-content: flex-start;
+      align-items: stretch;
       gap: 6px;
     }
     body.keyboard-open .footer-area {
@@ -586,9 +600,10 @@ if (window.visualViewport) {
     const viewport = window.visualViewport;
     const keyboardOpen = window.innerHeight - viewport.height > 120;
     document.body.classList.toggle('keyboard-open', keyboardOpen);
-    // キーボード表示中は、見えている領域内にゲーム画面を収める
+    // キーボード表示中はゲーム画面を可視領域の上端に固定する
     container.style.height = viewport.height + 'px';
-    container.style.top = Math.max(0, viewport.offsetTop) + 'px';
+    container.style.top = (keyboardOpen ? Math.max(0, viewport.offsetTop) : '') + 'px';
+    container.style.left = keyboardOpen ? '0px' : '';
     window.scrollTo(0, 0);
   };
   window.visualViewport.addEventListener('resize', updateViewportLayout);
