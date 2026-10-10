@@ -833,10 +833,14 @@ function drawScene() {
   if (gameStarted && currentQIndex < questions.length && !isTransitioning) {
     if (!isPaused && cardScale < 1.0) cardScale += 0.08;
 
+    const keyboardOpen = document.body.classList.contains('keyboard-open');
+    // キーボード表示中は、上部UIと回答欄に重ならない位置・高さに画像カードを配置
     let cardW = Math.min(580, w * 0.92) * cardScale;
-    let cardH = Math.min(380, h * 0.62) * cardScale;
+    let cardH = (keyboardOpen ? Math.min(240, h * 0.34) : Math.min(380, h * 0.62)) * cardScale;
     let cardX = cx - cardW / 2;
-    let cardY = cy - cardH / 2 - 25;
+    let cardY = keyboardOpen
+      ? h * 0.32 + (h * 0.34 - cardH) / 2
+      : cy - cardH / 2 - 25;
 
     const currentQ = questions[currentQIndex];
     const imgObj = currentQ ? loadedImages[currentQ.id] : null;
