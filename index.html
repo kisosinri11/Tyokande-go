@@ -834,16 +834,20 @@ function drawScene() {
     if (!isPaused && cardScale < 1.0) cardScale += 0.08;
 
     const keyboardOpen = document.body.classList.contains('keyboard-open');
-    // キーボード表示中は、上部UIと回答欄に重ならない位置・高さに画像カードを配置
-    let cardW = Math.min(580, w * 0.92) * cardScale;
-    let cardH = (keyboardOpen ? Math.min(240, h * 0.34) : Math.min(380, h * 0.62)) * cardScale;
+    // 写真の縦横比を維持し、表示可能な枠内に全体を収める
+    const currentQ = questions[currentQIndex];
+    const imgObj = currentQ ? loadedImages[currentQ.id] : null;
+    const maxCardW = Math.min(580, w * 0.92);
+    const maxCardH = keyboardOpen ? Math.min(240, h * 0.34) : Math.min(380, h * 0.62);
+    const imageAspect = imgObj && imgObj.naturalWidth > 0 && imgObj.naturalHeight > 0
+      ? imgObj.naturalWidth / imgObj.naturalHeight
+      : 16 / 9;
+    let cardW = Math.min(maxCardW, maxCardH * imageAspect) * cardScale;
+    let cardH = (cardW / imageAspect);
     let cardX = cx - cardW / 2;
     let cardY = keyboardOpen
       ? h * 0.32 + (h * 0.34 - cardH) / 2
       : cy - cardH / 2 - 25;
-
-    const currentQ = questions[currentQIndex];
-    const imgObj = currentQ ? loadedImages[currentQ.id] : null;
 
     ctx.save();
     ctx.shadowColor = area.color;
