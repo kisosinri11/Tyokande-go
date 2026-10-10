@@ -376,6 +376,14 @@
     }
     body.keyboard-open .ui-layer {
       padding: 6px;
+      /* キーボード表示中は、中央・下部に置かれていたUIを上側へ寄せる */
+      justify-content: flex-start;
+      gap: 6px;
+    }
+    body.keyboard-open .footer-area {
+      /* 回答欄をキーボードに隠されないよう、上側に配置 */
+      margin-top: 2px;
+      margin-bottom: 0;
     }
     body.keyboard-open .header-bar {
       padding: 4px 7px;
@@ -477,7 +485,7 @@
   <!-- スタート画面 -->
   <div class="start-overlay" id="start-overlay">
     <div class="start-title">直感で印象を答えろ！直感でGO！</div>
-    <div class="start-subtitle">超展開シネマティック・ダイナミックBGM版・全15問</div>
+    <div class="start-subtitle">制作：23期基礎心理学ゼミ11班</div>
     <button class="retro-btn" id="start-btn">GAME START</button>
   </div>
 
