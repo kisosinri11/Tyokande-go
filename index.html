@@ -24,7 +24,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      position: fixed; /* スマホでの意図せぬスクロールを防止 */
+      position: fixed;
     }
     #game-container {
       position: relative;
@@ -356,7 +356,6 @@
     }
     table.log-table th { background: #333; color: #f8b800; }
 
-    /* スマホ対応メディアクエリ: キーボード表示時のレイアウト圧縮 */
     @media (max-height: 550px) {
       .header-bar { padding: 4px 8px; }
       .question-title { font-size: 14px; }
@@ -383,7 +382,7 @@
   <div class="title-drop-overlay" id="title-drop-overlay">
     <div class="title-card">
       <div class="main-title-text">直感を表情で読み取れ！<br>直感GO！</div>
-      <div class="sub-title-text">Powered by 基礎心理学ゼミ11班</div>
+      <div class="sub-title-text">Powered by 基礎心理学11班</div>
     </div>
   </div>
 
@@ -403,7 +402,7 @@
       <div class="header-bar interactive">
         <div class="question-title">この画像から受ける印象は？</div>
         <div class="header-controls">
-          <button class="btn-small" id="bgm-toggle">BGM: ON</button>
+          <button class="btn-small" id="bgm-toggle">BGM: OFF</button>
           <button class="btn-small" id="admin-btn">⚙ 管理設定</button>
         </div>
       </div>
@@ -444,19 +443,25 @@
 
     <div id="admin-panel" class="hidden">
       <div style="display:flex; gap:6px; margin-bottom:12px;">
-        <button class="btn-small" id="tab-questions-btn" style="background:#f8b800; color:#000;">問題管理</button>
+        <button class="btn-small" id="tab-questions-btn" style="background:#f8b800; color:#000;">問題・BGM管理</button>
         <button class="btn-small" id="tab-logs-btn">📊 回答ログ確認</button>
       </div>
 
-      <!-- 問題追加・管理タブ -->
+      <!-- 問題・BGM追加・管理タブ -->
       <div id="tab-questions-content">
+        <h3 style="font-size: 14px;">BGM設定 (全プレイヤー共通)</h3>
+        <div style="display: flex; flex-direction: column; gap: 6px; margin: 8px 0 16px 0;">
+          <input type="file" id="bgm-file-input" accept="audio/*" style="font-size: 12px;">
+          <button class="btn-small" id="upload-bgm-btn" style="background:#f8b800; color:#000;">BGMをサーバーに保存</button>
+        </div>
+
         <h3 style="font-size: 14px;">問題追加</h3>
         <div style="display: flex; flex-direction: column; gap: 6px; margin: 8px 0 16px 0;">
           <input type="text" id="new-title" placeholder="タイトル（例: 画像①）" style="padding: 6px; font-family:'DotGothic16', monospace; font-size: 14px;">
           <input type="file" id="new-img-file" accept="image/*" style="font-size: 12px;">
-          <button class="btn-small" id="add-q-btn">追加</button>
+          <button class="btn-small" id="add-q-btn">問題を追加</button>
         </div>
-        <h3 style="font-size: 14px;">問題リスト</h3>
+        <h3 style="font-size: 14px;">サーバー上の問題リスト</h3>
         <div id="q-list" style="margin-top: 8px;"></div>
       </div>
 
@@ -487,112 +492,29 @@ if (window.visualViewport) {
   });
 }
 
-// --- Web Audio API サウンドジェネレーター ---
-let audioCtx = null;
-let bgmEnabled = true;
-let isPaused = false;
-let bgmTimer = null;
-let isBgmPlaying = false;
+// --- サーバー連動オーディオ (BGM) ---
+let bgmAudio = null;
+let bgmEnabled = false;
+let serverBgmUrl = "";
 
-function initAudioContext() {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playAudioBGM() {
+  if (!bgmEnabled || !serverBgmUrl) return;
+  if (!bgmAudio) {
+    bgmAudio = new Audio(serverBgmUrl);
+    bgmAudio.loop = true;
   }
-  if (audioCtx.state === 'suspended') {
-    audioCtx.resume();
-  }
-}
-
-function play8BitTone(freq, duration, type = 'square', gainVal = 0.1) {
-  if (!bgmEnabled || !audioCtx || freq <= 0) return;
-  try {
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = type;
-    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-    gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start();
-    osc.stop(audioCtx.currentTime + duration);
-  } catch(e) {}
-}
-
-const N = {
-  OFF: 0,
-  A3: 220.00, B3: 246.94,
-  C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392.00, GS4: 415.30, A4: 440.00, B4: 493.88,
-  C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99, A5: 880.00, B5: 987.77, C6: 1046.50
-};
-
-let noteStep = 0;
-
-function startBgmSequence() {
-  if (isBgmPlaying) return;
-  isBgmPlaying = true;
-  
-  bgmTimer = setInterval(() => {
-    if (!bgmEnabled || isPaused) return;
-
-    const leadSeq = [
-      N.A4, N.C5, N.E5, N.A5, N.G5, N.OFF, N.F5, N.E5,
-      N.D5, N.E5, N.F5, N.G5, N.A5, N.B5, N.C6, N.OFF,
-      N.C6, N.B5, N.A5, N.G5, N.A5, N.OFF, N.E5, N.OFF,
-      N.E5, N.F5, N.G5, N.GS4, N.A4, N.OFF, N.E4, N.OFF
-    ];
-
-    const bassSeq = [
-      N.A3, N.A3, N.C4, N.A3, N.G4, N.G4, N.F4, N.E4,
-      N.D4, N.D4, N.F4, N.D4, N.F4, N.G4, N.A4, N.G4,
-      N.A3, N.C4, N.E4, N.A3, N.C4, N.E4, N.C4, N.A3,
-      N.E4, N.F4, N.G4, N.E4, N.A3, N.A3, N.E3 || (N.E4/2), N.A3
-    ];
-
-    const currentStep = noteStep % 32;
-
-    let lead = leadSeq[currentStep];
-    if (lead > 0) play8BitTone(lead, 0.09, 'square', 0.12);
-
-    let bass = bassSeq[currentStep];
-    if (bass > 0) play8BitTone(bass / 2, 0.11, 'triangle', 0.18);
-
-    if (currentStep % 2 === 1) play8BitTone(220, 0.03, 'square', 0.02);
-
-    noteStep++;
-  }, 105);
+  bgmAudio.play().catch(err => console.log("BGM再生待機中:", err));
 }
 
 function stopAudioBGM() {
-  isBgmPlaying = false;
-  clearInterval(bgmTimer);
-}
-
-function playAudioBGM() {
-  initAudioContext();
-  startBgmSequence();
-}
-
-function play8BitTitleSE() {
-  initAudioContext();
-  if (!bgmEnabled || !audioCtx) return;
-  
-  const seChord = [N.C4, N.E4, N.G4, N.C5];
-  seChord.forEach(f => play8BitTone(f, 0.8, 'sawtooth', 0.12));
-  
-  setTimeout(() => {
-    [N.D4, N.F4, N.A4, N.D5].forEach(f => play8BitTone(f, 1.2, 'square', 0.15));
-  }, 200);
+  if (bgmAudio) {
+    bgmAudio.pause();
+    bgmAudio.currentTime = 0;
+  }
 }
 
 // --- 初期データ & キャッシュ処理 ---
-const defaultQuestions = Array.from({ length: 10 }, (_, i) => ({
-  id: i + 1,
-  title: `画像${String.fromCharCode(9312 + i)}`,
-  img: ""
-}));
-
-let questions = defaultQuestions;
+let questions = [];
 let imageCache = {};
 let localAnswers = [];
 
@@ -601,6 +523,7 @@ let timeLimit = 7.0;
 let timeRemaining = timeLimit;
 let timerInterval = null;
 let gameStarted = false;
+let isPaused = false;
 
 function preloadAllImages() {
   questions.forEach(q => {
@@ -612,22 +535,28 @@ function preloadAllImages() {
   });
 }
 
-async function fetchQuestionsFromGAS() {
+// サーバー（スプレッドシート）から最新の問題と共通BGM設定を同期
+async function fetchConfigFromGAS() {
   try {
-    const res = await fetch(GAS_URL + "?action=getQuestions");
+    const res = await fetch(GAS_URL + "?action=getConfig");
     const data = await res.json();
-    if (Array.isArray(data) && data.length > 0) {
-      questions = data;
-      preloadAllImages();
+    if (data) {
+      if (Array.isArray(data.questions) && data.questions.length > 0) {
+        questions = data.questions;
+        preloadAllImages();
+      }
+      if (data.bgmUrl) {
+        serverBgmUrl = data.bgmUrl;
+      }
     }
   } catch (err) {
-    console.warn("問題リストの取得に失敗したためデフォルト問題を使用します:", err);
+    console.warn("サーバー設定の取得に失敗しました:", err);
   }
 }
 
-fetchQuestionsFromGAS();
+fetchConfigFromGAS();
 
-// --- Canvas描画 ---
+// --- Canvas背景描画 ---
 const canvas = document.getElementById('bg-canvas');
 const ctx = canvas.getContext('2d');
 let bgOffset = 0;
@@ -744,16 +673,18 @@ async function startGame() {
   document.getElementById('start-overlay').style.display = 'none';
   document.getElementById('result-overlay').classList.add('hidden');
 
-  playAudioBGM();
-  play8BitTitleSE();
+  if (bgmEnabled) playAudioBGM();
 
   const titleDropOverlay = document.getElementById('title-drop-overlay');
   titleDropOverlay.classList.add('active');
 
-  const fetchPromise = fetchQuestionsFromGAS();
+  const fetchPromise = fetchConfigFromGAS();
 
   setTimeout(async () => {
     await fetchPromise;
+    if (questions.length === 0) {
+      alert("サーバーに問題が登録されていません。管理者設定から問題を追加してください。");
+    }
     titleDropOverlay.classList.remove('active');
     currentQIndex = 0;
     loadQuestion(0);
@@ -841,7 +772,6 @@ function handleAnswerSubmit() {
 
 function submitAndNext(userText) {
   clearInterval(timerInterval);
-  play8BitTone(523.25, 0.1, 'square', 0.1);
 
   const currentQ = questions[currentQIndex];
   const qTitle = currentQ ? currentQ.title : `問題${currentQIndex + 1}`;
@@ -911,7 +841,11 @@ answerInput.addEventListener('keydown', (e) => {
 document.getElementById('bgm-toggle').addEventListener('click', () => {
   bgmEnabled = !bgmEnabled;
   document.getElementById('bgm-toggle').textContent = bgmEnabled ? "BGM: ON" : "BGM: OFF";
-  if (bgmEnabled) playAudioBGM(); else stopAudioBGM();
+  if (bgmEnabled) {
+    playAudioBGM();
+  } else {
+    stopAudioBGM();
+  }
 });
 
 // --- 管理画面モーダル ---
@@ -924,7 +858,7 @@ function openAdminModal() {
 function closeAdminModal() {
   isPaused = false;
   document.getElementById('admin-modal').classList.add('hidden');
-  if (gameStarted) {
+  if (gameStarted && bgmEnabled) {
     playAudioBGM();
     document.getElementById('answer-input').focus();
   }
@@ -940,7 +874,7 @@ document.getElementById('admin-login-btn').addEventListener('click', async () =>
     document.getElementById('admin-auth').classList.add('hidden');
     document.getElementById('admin-panel').classList.remove('hidden');
     document.getElementById('admin-pass-input').value = "";
-    await fetchQuestionsFromGAS();
+    await fetchConfigFromGAS();
     renderAdminList();
     renderLogs();
   } else {
@@ -967,6 +901,35 @@ document.getElementById('tab-logs-btn').addEventListener('click', () => {
   renderLogs();
 });
 
+// 共通BGMのサーバー保存
+document.getElementById('upload-bgm-btn').addEventListener('click', () => {
+  const fileInput = document.getElementById('bgm-file-input');
+  if (!fileInput.files || !fileInput.files[0]) {
+    alert("音楽ファイルを選択してください");
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const audioData = e.target.result;
+    fetch(GAS_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type: "setBGM",
+        bgmUrl: audioData
+      })
+    }).then(() => {
+      alert("共通BGMをサーバーに保存しました！次回プレイ時から全プレイヤーに適用されます。");
+      serverBgmUrl = audioData;
+      fileInput.value = "";
+    }).catch(err => console.error("BGM保存エラー:", err));
+  };
+  reader.readAsDataURL(fileInput.files[0]);
+});
+
+// 問題の追加
 document.getElementById('add-q-btn').addEventListener('click', () => {
   const title = document.getElementById('new-title').value || `画像${questions.length + 1}`;
   const fileInput = document.getElementById('new-img-file');
@@ -986,7 +949,7 @@ document.getElementById('add-q-btn').addEventListener('click', () => {
       document.getElementById('new-title').value = "";
       fileInput.value = "";
       setTimeout(async () => {
-        await fetchQuestionsFromGAS();
+        await fetchConfigFromGAS();
         renderAdminList();
         renderBadges();
       }, 1000);
@@ -1049,7 +1012,7 @@ window.deleteQ = function(id) {
     })
   }).then(() => {
     setTimeout(async () => {
-      await fetchQuestionsFromGAS();
+      await fetchConfigFromGAS();
       renderAdminList();
       renderBadges();
     }, 1000);
