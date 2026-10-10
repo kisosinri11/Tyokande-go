@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>直感で印象を答えろ！直感でGO！</title>
+  <title>直感で印象yを答えろ！直感でGO！</title>
   <!-- 8bit風フォント（DotGothic16） -->
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
   <style>
@@ -71,7 +71,7 @@
       position: absolute;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: rgba(0,0,0,0.92);
+      background: rgba(0,0,0,0.85);
       z-index: 9999;
       display: flex;
       flex-direction: column;
@@ -87,7 +87,7 @@
       position: absolute;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: rgba(0,0,0,0.95);
+      background: rgba(0,0,0,0.92);
       z-index: 9999;
       display: flex;
       flex-direction: column;
@@ -111,14 +111,6 @@
       color: #00f0f0;
       text-shadow: 2px 2px 0px #000;
       margin-top: -10px;
-      text-align: center;
-    }
-
-    .result-instruction {
-      font-size: 14px;
-      color: #00f0f0;
-      text-shadow: 2px 2px 0px #000;
-      margin-top: 4px;
       text-align: center;
     }
 
@@ -146,7 +138,7 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.5);
       pointer-events: none;
       opacity: 0;
       transition: opacity 0.5s ease;
@@ -389,11 +381,10 @@
   <!-- リザルト画面 -->
   <div class="result-overlay hidden" id="result-overlay">
     <div>
-      <div class="start-title" style="color:#f8b800; font-size:22px;">全問題終了！</div>
-      <div class="result-instruction">この画面をスクリーンショットをしてFormsに添付してください。</div>
+      <div class="start-title" style="color:#f8b800; font-size:24px; margin-top: 10px;">全問題終了！</div>
     </div>
     <div class="result-summary-box" id="result-summary"></div>
-    <button class="retro-btn" id="restart-btn">最初から遊ぶ</button>
+    <button class="retro-btn" id="restart-btn" style="margin-bottom: 10px;">最初から遊ぶ</button>
   </div>
 
   <!-- UIレイアウト -->
@@ -535,7 +526,6 @@ function preloadAllImages() {
   });
 }
 
-// サーバー（スプレッドシート）から最新の問題と共通BGM設定を同期
 async function fetchConfigFromGAS() {
   try {
     const res = await fetch(GAS_URL + "?action=getConfig");
@@ -556,13 +546,30 @@ async function fetchConfigFromGAS() {
 
 fetchConfigFromGAS();
 
-// --- Canvas背景描画 ---
+// --- Canvas背景描画（惑星・星・ワープ演出） ---
 const canvas = document.getElementById('bg-canvas');
 const ctx = canvas.getContext('2d');
 let bgOffset = 0;
 let cardScale = 0.1;
 let loadedImg = null;
 let shipYOffset = 0;
+
+// 星の生成
+const stars = Array.from({ length: 70 }, () => ({
+  x: Math.random() * 1000,
+  y: Math.random() * 750,
+  size: Math.random() * 2.5 + 1,
+  speed: Math.random() * 1.5 + 0.5,
+  color: ['#ffffff', '#00f0f0', '#f8b800', '#ff3344'][Math.floor(Math.random() * 4)]
+}));
+
+// 惑星の生成
+const planets = [
+  { x: 150, y: 120, radius: 28, color: '#e60012', ring: true, speed: 0.3 },
+  { x: 800, y: 500, radius: 45, color: '#0088cc', ring: false, speed: 0.2 },
+  { x: 700, y: 180, radius: 20, color: '#f8b800', ring: false, speed: 0.4 },
+  { x: 250, y: 600, radius: 35, color: '#9900ff', ring: true, speed: 0.25 }
+];
 
 function resizeCanvas() {
   canvas.width = canvas.parentElement.clientWidth;
@@ -572,19 +579,68 @@ window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
 function drawScene() {
-  if (!isPaused) {
-    bgOffset += 4;
-    shipYOffset += 0.05;
-  }
-  
   const w = canvas.width;
   const h = canvas.height;
   const cx = w / 2;
   const cy = h * 0.35;
 
-  ctx.fillStyle = '#050515';
+  if (!isPaused) {
+    bgOffset += 4;
+    shipYOffset += 0.05;
+  }
+
+  // 宇宙の背景色
+  ctx.fillStyle = '#030310';
   ctx.fillRect(0, 0, w, h);
 
+  // 1. 流れる星屑（背景の星）
+  stars.forEach(star => {
+    if (!isPaused) {
+      star.y += star.speed;
+      if (star.y > h) { star.y = 0; star.x = Math.random() * w; }
+    }
+    ctx.fillStyle = star.color;
+    ctx.fillRect(star.x, star.y, star.size, star.size);
+  });
+
+  // 2. 惑星の描画
+  planets.forEach(p => {
+    if (!isPaused) {
+      p.y += p.speed;
+      if (p.y - p.radius > h) {
+        p.y = -p.radius;
+        p.x = Math.random() * w;
+      }
+    }
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // 惑星のクレーター風模様
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+    ctx.beginPath();
+    ctx.arc(p.x - p.radius * 0.3, p.y - p.radius * 0.3, p.radius * 0.25, 0, Math.PI * 2);
+    ctx.arc(p.x + p.radius * 0.4, p.y + p.radius * 0.2, p.radius * 0.18, 0, Math.PI * 2);
+    ctx.fill();
+
+    // リング付き惑星（土星風）
+    if (p.ring) {
+      ctx.strokeStyle = '#f8b800';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.ellipse(p.x, p.y, p.radius * 1.8, p.radius * 0.5, Math.PI / 6, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.restore();
+  });
+
+  // 3. 3Dワープグリッド（ファイブツアーズ風）
   ctx.strokeStyle = '#1a2b56';
   ctx.lineWidth = 2;
   for (let i = -8; i <= 8; i++) {
@@ -606,6 +662,7 @@ function drawScene() {
     ctx.strokeRect(rectX, rectY, rectW, rectH);
   }
 
+  // クイズ問題カードの描画
   if (gameStarted && currentQIndex < questions.length) {
     if (!isPaused && cardScale < 1.0) cardScale += 0.05;
 
