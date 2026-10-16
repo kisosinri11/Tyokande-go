@@ -19,19 +19,19 @@
       color: #fff;
       font-family: 'DotGothic16', monospace;
       overflow: hidden;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      width: 100%;
+      height: 100dvh;
+      display: block;
       position: fixed;
+      inset: 0;
     }
     #game-container {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      max-width: 1100px;
-      max-height: 800px;
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100dvh;
+      max-width: none;
+      max-height: none;
       background: #000;
       border: 6px solid #fff;
       box-shadow: 0 0 50px rgba(255,255,255,0.7);
@@ -370,86 +370,56 @@
       color: #fff;
     }
 
-    /* キーボード表示中もPC版と同じUI配置を維持し、ゲーム画面全体だけを表示領域に合わせる */
-    body.keyboard-open {
-      display: block;
+    /* iPhone / Android共通：Visual Viewportの実寸を使う */
+    :root { --app-height: 100dvh; }
+    html, body {
       width: 100%;
-      height: 100%;
-      inset: 0 auto auto 0;
+      height: var(--app-height);
+      min-height: 0;
+      overflow: hidden;
+      overscroll-behavior: none;
     }
-    body.keyboard-open #game-container {
+    body {
       position: fixed;
-      left: 0;
-      top: 0;
-      width: 100vw;
-      height: 100%;
-      max-width: none;
+      inset: 0;
       margin: 0;
+    }
+    #game-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: var(--app-height);
+      min-width: 0;
+      min-height: 0;
+      max-width: none;
+      max-height: none;
     }
 
-    /* キーボード表示中はUI全体をコンパクトにし、背景写真の見える範囲を確保 */
-    body.keyboard-open .ui-layer {
-      padding: 6px;
-      gap: 4px;
+    /* キーボード表示中だけ、UI全体の比率を保ちつつコンパクト化 */
+    body.keyboard-open #game-container {
+      top: var(--viewport-top, 0px);
+      height: var(--app-height);
     }
-    body.keyboard-open .header-bar {
-      padding: 5px 8px;
-      border-width: 3px;
-      box-shadow: 3px 3px 0 #000;
-      gap: 5px;
-    }
-    body.keyboard-open .question-title {
-      font-size: 14px;
-      line-height: 1.25;
-    }
-    body.keyboard-open .header-controls { gap: 4px; }
-    body.keyboard-open .btn-small {
-      font-size: 11px;
-      padding: 3px 5px;
-      border-width: 1px;
-      box-shadow: 2px 2px 0 #000;
-    }
-    body.keyboard-open .stage-badges {
-      gap: 3px;
-      margin: 0;
-      flex-wrap: nowrap;
-    }
-    body.keyboard-open .badge {
-      width: 24px;
-      height: 24px;
-      min-width: 0;
-      font-size: 11px;
-      border-width: 1px;
-      box-shadow: 2px 2px 0 #000;
-    }
-    body.keyboard-open .footer-area {
-      gap: 5px;
-      margin: 0 0 4px;
-      padding: 6px;
-      border-width: 3px;
-      box-shadow: 3px 3px 0 #000;
-    }
-    body.keyboard-open .timer-container {
-      padding: 2px;
-      gap: 5px;
-      border-width: 2px;
-    }
-    body.keyboard-open .timer-bar-bg { height: 9px; }
-    body.keyboard-open .timer-text { font-size: 14px; }
-    body.keyboard-open .input-form { gap: 5px; }
-    body.keyboard-open .answer-input {
-      min-width: 0;
-      padding: 5px 7px;
-      font-size: 16px;
-      border-width: 2px;
-    }
-    body.keyboard-open #submit-btn {
-      font-size: 16px;
-      padding: 5px 10px;
-      border-width: 2px;
-      box-shadow: 3px 3px 0 #000;
-    }
+    body.keyboard-open .ui-layer { padding: 5px; gap: 3px; }
+    body.keyboard-open .header-bar { padding: 4px 6px; border-width: 2px; gap: 4px; }
+    body.keyboard-open .question-title { font-size: 12px; line-height: 1.15; }
+    body.keyboard-open .header-controls { gap: 3px; }
+    body.keyboard-open .btn-small { font-size: 10px; padding: 2px 4px; border-width: 1px; }
+    body.keyboard-open .stage-badges { gap: 2px; margin: 0; flex-wrap: nowrap; }
+    body.keyboard-open .badge { width: min(5.8vw, 24px); height: min(5.8vw, 24px); min-width: 0; font-size: 10px; border-width: 1px; }
+    body.keyboard-open .footer-area { gap: 4px; margin: 0 0 2px; padding: 4px; border-width: 2px; }
+    body.keyboard-open .timer-container { padding: 2px; gap: 4px; border-width: 2px; }
+    body.keyboard-open .timer-bar-bg { height: 7px; }
+    body.keyboard-open .timer-text { font-size: 12px; width: 30px; }
+    body.keyboard-open .input-form { gap: 4px; }
+    body.keyboard-open .answer-input { min-width: 0; padding: 3px 5px; font-size: 16px; border-width: 2px; }
+    body.keyboard-open #submit-btn { font-size: 14px; padding: 4px 7px; border-width: 2px; box-shadow: 2px 2px 0 #000; }
     body.keyboard-open .footer-credits { display: none; }
+
+    @media (orientation: portrait) {
+      .modal-content { width: 96%; padding: 10px; }
+    }
 
     .hidden { display: none !important; }
 
@@ -519,7 +489,7 @@
         <div class="timer-bar-bg">
           <div class="timer-bar-fill" id="timer-bar"></div>
         </div>
-        <div class="timer-text" id="timer-text">7.0</div>
+        <div class="timer-text" id="timer-text">15.0</div>
       </div>
       <div class="input-form">
         <input type="text" class="answer-input" id="answer-input" placeholder="印象を入力して決定" autocomplete="off">
@@ -569,23 +539,48 @@
 // --- GAS 連携 URL ---
 const GAS_URL = "https://script.google.com/macros/s/AKfycbzIG8PIwSxkeRpbBP6wDCJrBZ-lV3TlgCet5EthJSur916CmGv7jOm9r3AjAbVtvw6x/exec";
 
-// --- スマホキーボード対応 (UIレイアウトのみ調整) ---
-if (window.visualViewport) {
+// --- iOS Safari / Android共通：表示可能領域に追従 ---
+(() => {
   const container = document.getElementById('game-container');
+  const root = document.documentElement;
+  let lastKeyboardState = false;
+
   const updateViewportLayout = () => {
-    const viewport = window.visualViewport;
-    const keyboardOpen = window.innerHeight - viewport.height > 120;
+    const vv = window.visualViewport;
+    const height = vv ? vv.height : window.innerHeight;
+    const top = vv ? Math.max(0, vv.offsetTop) : 0;
+    const active = document.activeElement;
+    const inputFocused = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA');
+    // iOSではinnerHeightがキーボードに追従しない場合があるため、複数条件で判定
+    const keyboardOpen = !!(vv && (
+      window.innerHeight - vv.height > 100 ||
+      (inputFocused && vv.height < window.screen.height * 0.72)
+    ));
+
+    root.style.setProperty('--app-height', `${height}px`);
+    root.style.setProperty('--viewport-top', `${top}px`);
+    container.style.height = `${height}px`;
+    container.style.top = `${top}px`;
+    container.style.left = '0px';
     document.body.classList.toggle('keyboard-open', keyboardOpen);
-    // ゲーム画面全体を可視領域の上端に合わせる。各UIの配置比率は変更しない
-    container.style.height = viewport.height + 'px';
-    container.style.top = (keyboardOpen ? Math.max(0, viewport.offsetTop) : '') + 'px';
-    container.style.left = keyboardOpen ? '0px' : '';
+    if (keyboardOpen !== lastKeyboardState) {
+      lastKeyboardState = keyboardOpen;
+      // UIのレイアウト確定後に背景キャンバスの寸法を再計算
+      requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
+    }
     window.scrollTo(0, 0);
   };
-  window.visualViewport.addEventListener('resize', updateViewportLayout);
-  window.visualViewport.addEventListener('scroll', updateViewportLayout);
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', updateViewportLayout);
+    window.visualViewport.addEventListener('scroll', updateViewportLayout);
+  }
+  window.addEventListener('resize', updateViewportLayout);
+  window.addEventListener('orientationchange', () => setTimeout(updateViewportLayout, 100));
+  document.addEventListener('focusin', updateViewportLayout);
+  document.addEventListener('focusout', () => setTimeout(updateViewportLayout, 150));
   updateViewportLayout();
-}
+})();
 
 // --- 5つのエリア定義 ---
 const areas = [
@@ -624,7 +619,7 @@ let loadedImages = {};
 let localAnswers = [];
 
 let currentQIndex = 0;
-let timeLimit = 7.0;
+let timeLimit = 15.0;
 let timeRemaining = timeLimit;
 let timerInterval = null;
 let gameStarted = false;
