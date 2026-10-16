@@ -520,6 +520,82 @@
       #selection-hint { font-size: 13px; }
     }
 
+
+    /* スマホ向けレイアウト調整：画像を大きく、問題文とタイマーを読みやすく */
+    @media (max-width: 520px) {
+      html, body {
+        width: 100%;
+        height: 100%;
+        height: 100dvh;
+        overflow: hidden;
+      }
+      body { align-items: stretch; justify-content: stretch; }
+      #game-container {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        max-width: none;
+        max-height: none;
+        border-width: 3px;
+        box-shadow: none;
+      }
+      .ui-layer { padding: 8px 7px 14px; }
+      .header-bar {
+        padding: 8px 9px;
+        border-width: 3px;
+        box-shadow: 3px 3px 0 #000;
+        gap: 6px;
+        align-items: flex-start;
+      }
+      .question-title {
+        flex: 1;
+        min-width: 0;
+        font-size: clamp(14px, 4vw, 17px);
+        line-height: 1.4;
+        overflow-wrap: anywhere;
+      }
+      .header-controls { flex-shrink: 0; gap: 3px; }
+      .btn-small { font-size: 11px; padding: 4px 5px; border-width: 1px; }
+      .stage-badges { gap: 4px; margin-top: 5px; }
+      .timer-container { max-width: none; gap: 6px; padding: 3px; border-width: 2px; }
+      .timer-bar-bg { height: 12px; }
+      .timer-text { font-size: 16px; width: 42px; }
+      .input-form { max-width: none; }
+      #selection-hint { font-size: 12px; line-height: 1.4; }
+      #choice-grid {
+        width: calc(100% - 18px);
+        max-width: 500px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 4px;
+        top: 51%;
+      }
+      .choice-card {
+        aspect-ratio: 1.18 / 1;
+        border-width: 2px;
+        box-shadow: 2px 2px 0 #000;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .choice-card .choice-number {
+        left: 2px;
+        top: 2px;
+        font-size: 11px;
+        line-height: 1.3;
+        padding: 0 3px;
+        border-width: 1px;
+      }
+      .footer-credits { font-size: 8px; bottom: 2px; }
+    }
+
+    /* 横向き・高さの低い画面では、画像グリッドを少し詰める */
+    @media (max-width: 900px) and (max-height: 520px) {
+      #choice-grid { width: min(68%, 620px); top: 53%; gap: 3px; }
+      .choice-card { aspect-ratio: 1.35 / 1; }
+      .ui-layer { padding: 5px 7px 10px; }
+      .header-bar { padding: 4px 7px; }
+      .question-title { font-size: 13px; }
+      .timer-bar-bg { height: 8px; }
+    }
+
     .hidden { display: none !important; }
 
     table.log-table {
