@@ -19,19 +19,19 @@
       color: #fff;
       font-family: 'DotGothic16', monospace;
       overflow: hidden;
-      width: 100%;
-      height: 100dvh;
-      display: block;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       position: fixed;
-      inset: 0;
     }
     #game-container {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100dvh;
-      max-width: none;
-      max-height: none;
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      max-width: 1100px;
+      max-height: 800px;
       background: #000;
       border: 6px solid #fff;
       box-shadow: 0 0 50px rgba(255,255,255,0.7);
@@ -237,6 +237,8 @@
     }
     .question-title {
       font-size: 18px;
+      line-height: 1.45;
+      white-space: pre-line;
       color: #00f0f0;
       text-shadow: 2px 2px 0px #000;
     }
@@ -281,7 +283,7 @@
       flex-direction: column;
       align-items: center;
       gap: 10px;
-      margin-bottom: 16px;
+      margin-bottom: 8px;
       background: rgba(0, 0, 0, 0.88);
       border: 4px solid #fff;
       padding: 12px;
@@ -370,55 +372,152 @@
       color: #fff;
     }
 
-    /* iPhone / Android共通：Visual Viewportの実寸を使う */
-    :root { --app-height: 100dvh; }
-    html, body {
+    /* キーボード表示中もPC版と同じUI配置を維持し、ゲーム画面全体だけを表示領域に合わせる */
+    body.keyboard-open {
+      display: block;
       width: 100%;
-      height: var(--app-height);
-      min-height: 0;
-      overflow: hidden;
-      overscroll-behavior: none;
+      height: 100%;
+      inset: 0 auto auto 0;
     }
-    body {
+    body.keyboard-open #game-container {
       position: fixed;
-      inset: 0;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100%;
+      max-width: none;
       margin: 0;
     }
-    #game-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: var(--app-height);
-      min-width: 0;
-      min-height: 0;
-      max-width: none;
-      max-height: none;
-    }
 
-    /* キーボード表示中だけ、UI全体の比率を保ちつつコンパクト化 */
-    body.keyboard-open #game-container {
-      top: var(--viewport-top, 0px);
-      height: var(--app-height);
+    /* キーボード表示中はUI全体をコンパクトにし、背景写真の見える範囲を確保 */
+    body.keyboard-open .ui-layer {
+      padding: 6px;
+      gap: 4px;
     }
-    body.keyboard-open .ui-layer { padding: 5px; gap: 3px; }
-    body.keyboard-open .header-bar { padding: 4px 6px; border-width: 2px; gap: 4px; }
-    body.keyboard-open .question-title { font-size: 12px; line-height: 1.15; }
-    body.keyboard-open .header-controls { gap: 3px; }
-    body.keyboard-open .btn-small { font-size: 10px; padding: 2px 4px; border-width: 1px; }
-    body.keyboard-open .stage-badges { gap: 2px; margin: 0; flex-wrap: nowrap; }
-    body.keyboard-open .badge { width: min(5.8vw, 24px); height: min(5.8vw, 24px); min-width: 0; font-size: 10px; border-width: 1px; }
-    body.keyboard-open .footer-area { gap: 4px; margin: 0 0 2px; padding: 4px; border-width: 2px; }
-    body.keyboard-open .timer-container { padding: 2px; gap: 4px; border-width: 2px; }
-    body.keyboard-open .timer-bar-bg { height: 7px; }
-    body.keyboard-open .timer-text { font-size: 12px; width: 30px; }
-    body.keyboard-open .input-form { gap: 4px; }
-    body.keyboard-open .answer-input { min-width: 0; padding: 3px 5px; font-size: 16px; border-width: 2px; }
-    body.keyboard-open #submit-btn { font-size: 14px; padding: 4px 7px; border-width: 2px; box-shadow: 2px 2px 0 #000; }
+    body.keyboard-open .header-bar {
+      padding: 5px 8px;
+      border-width: 3px;
+      box-shadow: 3px 3px 0 #000;
+      gap: 5px;
+    }
+    body.keyboard-open .question-title {
+      font-size: 14px;
+      line-height: 1.25;
+    }
+    body.keyboard-open .header-controls { gap: 4px; }
+    body.keyboard-open .btn-small {
+      font-size: 11px;
+      padding: 3px 5px;
+      border-width: 1px;
+      box-shadow: 2px 2px 0 #000;
+    }
+    body.keyboard-open .stage-badges {
+      gap: 3px;
+      margin: 0;
+      flex-wrap: nowrap;
+    }
+    body.keyboard-open .badge {
+      width: 24px;
+      height: 24px;
+      min-width: 0;
+      font-size: 11px;
+      border-width: 1px;
+      box-shadow: 2px 2px 0 #000;
+    }
+    body.keyboard-open .footer-area {
+      gap: 5px;
+      margin: 0 0 4px;
+      padding: 6px;
+      border-width: 3px;
+      box-shadow: 3px 3px 0 #000;
+    }
+    body.keyboard-open .timer-container {
+      padding: 2px;
+      gap: 5px;
+      border-width: 2px;
+    }
+    body.keyboard-open .timer-bar-bg { height: 9px; }
+    body.keyboard-open .timer-text { font-size: 14px; }
+    body.keyboard-open .input-form { gap: 5px; }
+    body.keyboard-open .answer-input {
+      min-width: 0;
+      padding: 5px 7px;
+      font-size: 16px;
+      border-width: 2px;
+    }
+    body.keyboard-open #submit-btn {
+      font-size: 16px;
+      padding: 5px 10px;
+      border-width: 2px;
+      box-shadow: 3px 3px 0 #000;
+    }
     body.keyboard-open .footer-credits { display: none; }
 
-    @media (orientation: portrait) {
-      .modal-content { width: 96%; padding: 10px; }
+
+    /* 9枚から印象に合う画像を選ぶグリッド */
+    #choice-grid {
+      position: absolute;
+      z-index: 5;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(82%, 680px);
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      pointer-events: auto;
+    }
+    .choice-card {
+      position: relative;
+      aspect-ratio: 4 / 3;
+      min-width: 0;
+      overflow: hidden;
+      border: 4px solid #fff;
+      background: #111;
+      box-shadow: 4px 4px 0 #000;
+      cursor: pointer;
+      padding: 0;
+    }
+    .choice-card img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      user-select: none;
+      pointer-events: none;
+    }
+    .choice-card .choice-number {
+      position: absolute;
+      left: 4px;
+      top: 4px;
+      background: rgba(0,0,0,.85);
+      color: #f8b800;
+      border: 2px solid #fff;
+      font-size: 14px;
+      padding: 0 5px;
+    }
+    .choice-card:active, .choice-card:focus-visible {
+      border-color: #00f0f0;
+      outline: 3px solid #00f0f0;
+    }
+    #selection-hint {
+      color: #00f0f0;
+      font-size: 16px;
+      text-align: center;
+      width: 100%;
+      text-shadow: 2px 2px #000;
+    }
+    body.keyboard-open #choice-grid {
+      width: min(94%, 640px);
+      gap: 4px;
+      top: 48%;
+    }
+    body.keyboard-open .choice-card { border-width: 2px; box-shadow: 2px 2px 0 #000; }
+    body.keyboard-open .choice-card .choice-number { font-size: 10px; border-width: 1px; }
+    @media (max-width: 520px) {
+      #choice-grid { width: 92%; gap: 5px; }
+      .choice-card { border-width: 3px; }
+      #selection-hint { font-size: 13px; }
     }
 
     .hidden { display: none !important; }
@@ -441,11 +540,12 @@
 
 <div id="game-container">
   <canvas id="bg-canvas"></canvas>
+  <div id="choice-grid" aria-label="印象に合う画像を選択"></div>
 
   <!-- スタート画面 -->
   <div class="start-overlay" id="start-overlay">
     <div class="start-title">直感で印象を答えろ！直感でGO！</div>
-    <div class="start-subtitle">超展開シネマティック・ダイナミックBGM版・全15問</div>
+    <div class="start-subtitle">超展開シネマティック・ダイナミックBGM版・全5問</div>
     <button class="retro-btn" id="start-btn">GAME START</button>
   </div>
 
@@ -466,7 +566,7 @@
   <!-- リザルト画面 -->
   <div class="result-overlay hidden" id="result-overlay">
     <div>
-      <div class="start-title" style="color:#f8b800; font-size:28px; margin-top: 10px;">全エリア踏破！お見事！</div>
+      <div class="start-title" style="color:#f8b800; font-size:28px; margin-top: 10px;">全5問終了！お見事！</div>
     </div>
     <div class="result-summary-box" id="result-summary"></div>
     <button class="retro-btn" id="restart-btn" style="margin-bottom: 10px;">最初から遊ぶ</button>
@@ -492,8 +592,7 @@
         <div class="timer-text" id="timer-text">15.0</div>
       </div>
       <div class="input-form">
-        <input type="text" class="answer-input" id="answer-input" placeholder="印象を入力して決定" autocomplete="off">
-        <button type="button" class="retro-btn" id="submit-btn">決定</button>
+        <div id="selection-hint">印象に合う画像をタップ！</div>
       </div>
     </div>
   </div>
@@ -539,48 +638,23 @@
 // --- GAS 連携 URL ---
 const GAS_URL = "https://script.google.com/macros/s/AKfycbzIG8PIwSxkeRpbBP6wDCJrBZ-lV3TlgCet5EthJSur916CmGv7jOm9r3AjAbVtvw6x/exec";
 
-// --- iOS Safari / Android共通：表示可能領域に追従 ---
-(() => {
+// --- スマホキーボード対応 (UIレイアウトのみ調整) ---
+if (window.visualViewport) {
   const container = document.getElementById('game-container');
-  const root = document.documentElement;
-  let lastKeyboardState = false;
-
   const updateViewportLayout = () => {
-    const vv = window.visualViewport;
-    const height = vv ? vv.height : window.innerHeight;
-    const top = vv ? Math.max(0, vv.offsetTop) : 0;
-    const active = document.activeElement;
-    const inputFocused = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA');
-    // iOSではinnerHeightがキーボードに追従しない場合があるため、複数条件で判定
-    const keyboardOpen = !!(vv && (
-      window.innerHeight - vv.height > 100 ||
-      (inputFocused && vv.height < window.screen.height * 0.72)
-    ));
-
-    root.style.setProperty('--app-height', `${height}px`);
-    root.style.setProperty('--viewport-top', `${top}px`);
-    container.style.height = `${height}px`;
-    container.style.top = `${top}px`;
-    container.style.left = '0px';
+    const viewport = window.visualViewport;
+    const keyboardOpen = window.innerHeight - viewport.height > 120;
     document.body.classList.toggle('keyboard-open', keyboardOpen);
-    if (keyboardOpen !== lastKeyboardState) {
-      lastKeyboardState = keyboardOpen;
-      // UIのレイアウト確定後に背景キャンバスの寸法を再計算
-      requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
-    }
+    // ゲーム画面全体を可視領域の上端に合わせる。各UIの配置比率は変更しない
+    container.style.height = viewport.height + 'px';
+    container.style.top = (keyboardOpen ? Math.max(0, viewport.offsetTop) : '') + 'px';
+    container.style.left = keyboardOpen ? '0px' : '';
     window.scrollTo(0, 0);
   };
-
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', updateViewportLayout);
-    window.visualViewport.addEventListener('scroll', updateViewportLayout);
-  }
-  window.addEventListener('resize', updateViewportLayout);
-  window.addEventListener('orientationchange', () => setTimeout(updateViewportLayout, 100));
-  document.addEventListener('focusin', updateViewportLayout);
-  document.addEventListener('focusout', () => setTimeout(updateViewportLayout, 150));
+  window.visualViewport.addEventListener('resize', updateViewportLayout);
+  window.visualViewport.addEventListener('scroll', updateViewportLayout);
   updateViewportLayout();
-})();
+}
 
 // --- 5つのエリア定義 ---
 const areas = [
@@ -591,31 +665,87 @@ const areas = [
   { id: 4, name: "エリア5", theme: "cyber", color: "#ff00ff" }
 ];
 
-// --- 15個の風景問題データ ---
-let questions = [
-  // エリア1 (0-2)
-  { id: "q1", title: "神秘的な森の小道", img: "https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&auto=format&fit=crop&q=60" },
-  { id: "q2", title: "夕暮れの海岸線", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=60" },
-  { id: "q3", title: "都会の夜景とネオン", img: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&auto=format&fit=crop&q=60" },
-  // エリア2 (3-5)
-  { id: "q4", title: "霧の中の山並み", img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&auto=format&fit=crop&q=60" },
-  { id: "q5", title: "荒涼とした砂漠", img: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=800&auto=format&fit=crop&q=60" },
-  { id: "q6", title: "静寂の雪景色", img: "https://images.unsplash.com/photo-1483921020237-2ff51e8e4b22?w=800&auto=format&fit=crop&q=60" },
-  // エリア3 (6-8)
-  { id: "q7", title: "満天の星空と銀河", img: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=800&auto=format&fit=crop&q=60" },
-  { id: "q8", title: "古い廃墟・建造物", img: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=60" },
-  { id: "q9", title: "鮮やかなひまわり畑", img: "https://images.unsplash.com/photo-1470246973918-29a93221c455?w=800&auto=format&fit=crop&q=60" },
-  // エリア4 (9-11)
-  { id: "q10", title: "激しい嵐の海", img: "https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=800&auto=format&fit=crop&q=60" },
-  { id: "q11", title: "穏やかな湖面のリフレクション", img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&auto=format&fit=crop&q=60" },
-  { id: "q12", title: "秋の紅葉と落ち葉", img: "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=800&auto=format&fit=crop&q=60" },
-  // エリア5 (12-14)
-  { id: "q13", title: "サイバーパンクな路地裏", img: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=60" },
-  { id: "q14", title: "どこまでも続く線路", img: "https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=800&auto=format&fit=crop&q=60" },
-  { id: "q15", title: "雲の上から見下ろす空", img: "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&auto=format&fit=crop&q=60" }
+// 問題ごとに異なる9枚の画像を表示（あとから差し替え可能）
+const imageOptionsByQuestion = [
+  [
+    { id: "q1_img1", title: "友達と料理をする人たち", img: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=800&auto=format&fit=crop&q=70" },
+    { id: "q1_img2", title: "バスケットボールをする選手", img: "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&auto=format&fit=crop&q=70" },
+    { id: "q1_img3", title: "友達と笑い合う人たち", img: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&auto=format&fit=crop&q=70" },
+    { id: "q1_img4", title: "絵を描く人", img: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800&auto=format&fit=crop&q=70" },
+    { id: "q1_img5", title: "山道を歩くハイカー", img: "https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&auto=format&fit=crop&q=70" },
+    { id: "q1_img6", title: "ギターを演奏する人", img: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=800&auto=format&fit=crop&q=70" },
+    { id: "q1_img7", title: "音楽に合わせて踊る人たち", img: "https://images.unsplash.com/photo-1504609813442-a8924e83f76e?w=800&auto=format&fit=crop&q=70" },
+    { id: "q1_img8", title: "植物の手入れをする人", img: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&auto=format&fit=crop&q=70" },
+    { id: "q1_img9", title: "実験をする人たち", img: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&auto=format&fit=crop&q=70" }
+  ],
+  [
+    { id: "q2_img1", title: "発表前に緊張する人", img: "https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&auto=format&fit=crop&q=70" },
+    { id: "q2_img2", title: "難しい課題に取り組む人", img: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop&q=70" },
+    { id: "q2_img3", title: "真剣に話し合う人たち", img: "https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=800&auto=format&fit=crop&q=70" },
+    { id: "q2_img4", title: "試合中に集中する選手", img: "https://images.unsplash.com/photo-1521412644187-c49fa049e84d?w=800&auto=format&fit=crop&q=70" },
+    { id: "q2_img5", title: "顕微鏡で観察する人", img: "https://images.unsplash.com/photo-1579154204601-01588f351e67?w=800&auto=format&fit=crop&q=70" },
+    { id: "q2_img6", title: "舞台裏で準備する人", img: "https://images.unsplash.com/photo-1503095396549-807759245b35?w=800&auto=format&fit=crop&q=70" },
+    { id: "q2_img7", title: "難しい作業をする人", img: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=800&auto=format&fit=crop&q=70" },
+    { id: "q2_img8", title: "チェスを考える人", img: "https://images.unsplash.com/photo-1586165368502-1bad197a6461?w=800&auto=format&fit=crop&q=70" },
+    { id: "q2_img9", title: "雨の中を急ぐ人", img: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&auto=format&fit=crop&q=70" }
+  ],
+  [
+    { id: "q3_img1", title: "本を読む人", img: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800&auto=format&fit=crop&q=70" },
+    { id: "q3_img2", title: "お茶をいれる人", img: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=800&auto=format&fit=crop&q=70" },
+    { id: "q3_img3", title: "ヨガをする人", img: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=70" },
+    { id: "q3_img4", title: "編み物をする人", img: "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=800&auto=format&fit=crop&q=70" },
+    { id: "q3_img5", title: "釣りをする人", img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop&q=70" },
+    { id: "q3_img6", title: "花を生ける人", img: "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800&auto=format&fit=crop&q=70" },
+    { id: "q3_img7", title: "窓辺でコーヒーを飲む人", img: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&auto=format&fit=crop&q=70" },
+    { id: "q3_img8", title: "スケッチをする人", img: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=800&auto=format&fit=crop&q=70" },
+    { id: "q3_img9", title: "犬をなでる人", img: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=800&auto=format&fit=crop&q=70" }
+  ],
+  [
+    { id: "q4_img1", title: "暗い部屋で実験する人", img: "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=800&auto=format&fit=crop&q=70" },
+    { id: "q4_img2", title: "仮面を作る人", img: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=800&auto=format&fit=crop&q=70" },
+    { id: "q4_img3", title: "夜に写真を撮る人", img: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&auto=format&fit=crop&q=70" },
+    { id: "q4_img4", title: "光を使った作品を作る人", img: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800&auto=format&fit=crop&q=70" },
+    { id: "q4_img5", title: "古い品物を調べる人", img: "https://images.unsplash.com/photo-1582139329536-e7284fece509?w=800&auto=format&fit=crop&q=70" },
+    { id: "q4_img6", title: "星を観察する人", img: "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&auto=format&fit=crop&q=70" },
+    { id: "q4_img7", title: "舞台衣装を整える人", img: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=800&auto=format&fit=crop&q=70" },
+    { id: "q4_img8", title: "彫刻作品を作る人", img: "https://images.unsplash.com/photo-1561839561-b13bcfe95249?w=800&auto=format&fit=crop&q=70" },
+    { id: "q4_img9", title: "水中を探検するダイバー", img: "https://images.unsplash.com/photo-1530053969600-caed2596d242?w=800&auto=format&fit=crop&q=70" }
+  ],
+  [
+    { id: "q5_img1", title: "ゴールを決めて喜ぶ選手", img: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800&auto=format&fit=crop&q=70" },
+    { id: "q5_img2", title: "ジェットコースターを楽しむ人", img: "https://images.unsplash.com/photo-1513883049090-d0b7439799bf?w=800&auto=format&fit=crop&q=70" },
+    { id: "q5_img3", title: "ライブで盛り上がる観客", img: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=800&auto=format&fit=crop&q=70" },
+    { id: "q5_img4", title: "ダンスの練習をする人たち", img: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&auto=format&fit=crop&q=70" },
+    { id: "q5_img5", title: "サーフィンをする人", img: "https://images.unsplash.com/photo-1502680390469-be75c86b636f?w=800&auto=format&fit=crop&q=70" },
+    { id: "q5_img6", title: "スケートボードをする人", img: "https://images.unsplash.com/photo-1520045892732-304bc3ac5d8e?w=800&auto=format&fit=crop&q=70" },
+    { id: "q5_img7", title: "ロケットの打ち上げを見守る人", img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=70" },
+    { id: "q5_img8", title: "料理を完成させて喜ぶ人", img: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&auto=format&fit=crop&q=70" },
+    { id: "q5_img9", title: "自転車レースをする選手", img: "https://images.unsplash.com/photo-1541625602330-2277c4c46182?w=800&auto=format&fit=crop&q=70" }
+  ]
 ];
 
+// 現在の問題に対応する9枚を事前読み込み
 let loadedImages = {};
+function initImages() {
+  imageOptionsByQuestion.flat().forEach(option => {
+    if (option.img && !loadedImages[option.id]) {
+      const imgObj = new Image();
+      imgObj.src = option.img;
+      loadedImages[option.id] = imgObj;
+    }
+  });
+}
+initImages();
+
+// 各問題では、表示された印象に最も合う画像を9枚から1枚選ぶ
+let questions = [
+  { id: "q1", title: "楽しそう" },
+  { id: "q2", title: "不安な気持ちになる" },
+  { id: "q3", title: "落ち着く" },
+  { id: "q4", title: "神秘的" },
+  { id: "q5", title: "ワクワクする" }
+];
+
 let localAnswers = [];
 
 let currentQIndex = 0;
@@ -626,18 +756,6 @@ let gameStarted = false;
 let isPaused = false;
 let isTransitioning = false;
 
-// 画像事前読み込み
-function initImages() {
-  questions.forEach(q => {
-    if (q.img && !loadedImages[q.id]) {
-      const imgObj = new Image();
-      imgObj.crossOrigin = "anonymous";
-      imgObj.src = q.img;
-      loadedImages[q.id] = imgObj;
-    }
-  });
-}
-initImages();
 
 // --- 動画ファイル「jackpot.mp4」から抽出したBGM（HTML内埋め込み） ---
 // ゲーム開始ボタンを押すと再生。ゲーム終了・リスタート時は停止。
@@ -712,7 +830,7 @@ window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
 function getCurrentArea() {
-  return areas[Math.floor(currentQIndex / 3)] || areas[4];
+  return areas[Math.min(currentQIndex, areas.length - 1)] || areas[4];
 }
 
 function triggerShake() {
@@ -824,51 +942,6 @@ function drawScene() {
     ctx.restore();
   });
 
-  // クイズ画像カード
-  if (gameStarted && currentQIndex < questions.length && !isTransitioning) {
-    if (!isPaused && cardScale < 1.0) cardScale += 0.08;
-
-    const keyboardOpen = document.body.classList.contains('keyboard-open');
-    // 写真の縦横比を維持し、表示可能な枠内に全体を収める
-    const currentQ = questions[currentQIndex];
-    const imgObj = currentQ ? loadedImages[currentQ.id] : null;
-    const maxCardW = Math.min(580, w * 0.92);
-    const maxCardH = keyboardOpen ? Math.min(240, h * 0.34) : Math.min(380, h * 0.62);
-    const imageAspect = imgObj && imgObj.naturalWidth > 0 && imgObj.naturalHeight > 0
-      ? imgObj.naturalWidth / imgObj.naturalHeight
-      : 16 / 9;
-    let cardW = Math.min(maxCardW, maxCardH * imageAspect) * cardScale;
-    let cardH = (cardW / imageAspect);
-    let cardX = cx - cardW / 2;
-    let cardY = keyboardOpen
-      ? h * 0.32 + (h * 0.34 - cardH) / 2
-      : cy - cardH / 2 - 25;
-
-    ctx.save();
-    ctx.shadowColor = area.color;
-    ctx.shadowBlur = 30 * cardScale;
-
-    if (imgObj && imgObj.complete && imgObj.naturalWidth > 0) {
-      ctx.drawImage(imgObj, cardX, cardY, cardW, cardH);
-      ctx.strokeStyle = area.color;
-      ctx.lineWidth = 8 * cardScale;
-      ctx.strokeRect(cardX, cardY, cardW, cardH);
-    } else {
-      ctx.fillStyle = "#111";
-      ctx.fillRect(cardX, cardY, cardW, cardH);
-      ctx.strokeStyle = area.color;
-      ctx.lineWidth = 8 * cardScale;
-      ctx.strokeRect(cardX, cardY, cardW, cardH);
-
-      ctx.fillStyle = area.color;
-      ctx.font = `bold ${Math.floor(26 * cardScale)}px 'DotGothic16', monospace`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(currentQ ? currentQ.title : "画像読込中...", cx, cy - 10);
-    }
-    ctx.restore();
-  }
-
   requestAnimationFrame(drawScene);
 }
 
@@ -902,16 +975,12 @@ document.getElementById('restart-btn').addEventListener('click', () => {
   stopDynamicBGM();
   document.getElementById('start-overlay').style.display = 'flex';
   document.getElementById('result-overlay').classList.add('hidden');
+  document.getElementById('choice-grid').innerHTML = '';
 });
 
 function loadQuestion(index) {
   if (index >= questions.length) {
     showResultScreen();
-    return;
-  }
-
-  if (index > 0 && index % 3 === 0) {
-    triggerAreaTransition(index);
     return;
   }
 
@@ -940,20 +1009,46 @@ function triggerAreaTransition(index) {
 }
 
 function setupQuestionState(index) {
-  cardScale = 0.1;
+  cardScale = 1;
   updateHeaderAndBadges();
+  renderChoices();
   resetTimer();
   
   setTimeout(() => {
-    if (!isPaused && !isTransitioning) document.getElementById('answer-input').focus();
+    
   }, 100);
+}
+
+function renderChoices() {
+  const grid = document.getElementById('choice-grid');
+  grid.innerHTML = "";
+  const optionsForQuestion = imageOptionsByQuestion[currentQIndex] || imageOptionsByQuestion[0];
+  optionsForQuestion.forEach((option, i) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'choice-card';
+    button.setAttribute('aria-label', `${i + 1}番：${option.title}`);
+    const img = document.createElement('img');
+    img.src = option.img;
+    img.alt = option.title;
+    img.loading = 'eager';
+    const number = document.createElement('span');
+    number.className = 'choice-number';
+    number.textContent = i + 1;
+    button.append(img, number);
+    button.addEventListener('click', () => {
+      if (isPaused || isTransitioning || !gameStarted) return;
+      submitAndNext(option.title);
+    });
+    grid.appendChild(button);
+  });
 }
 
 function updateHeaderAndBadges() {
   const area = getCurrentArea();
-  const areaNum = Math.floor(currentQIndex / 3) + 1;
+  const areaNum = currentQIndex + 1;
   const headerIndicator = document.getElementById('header-area-indicator');
-  headerIndicator.textContent = `【エリア ${areaNum}】この画像から受ける印象は？`;
+  headerIndicator.textContent = `次の印象に最も合う画像を選んでください\n「${questions[currentQIndex]?.title || "印象を選ぼう"}」`;
   headerIndicator.style.color = area.color;
 
   const container = document.getElementById('badges-container');
@@ -1028,7 +1123,8 @@ function submitAndNext(userText) {
     })
   }).catch(err => console.error("GAS送信エラー:", err));
 
-  document.getElementById('answer-input').value = "";
+  const answerInput = document.getElementById('answer-input');
+  if (answerInput) answerInput.value = "";
   currentQIndex++;
   loadQuestion(currentQIndex);
 }
@@ -1050,23 +1146,11 @@ function showResultScreen() {
   html += `</div>`;
   resultBox.innerHTML = html;
 
+  document.getElementById('choice-grid').innerHTML = '';
   document.getElementById('result-overlay').classList.remove('hidden');
 }
 
-// --- イベント制御 ---
-const answerInput = document.getElementById('answer-input');
-const submitBtn = document.getElementById('submit-btn');
-
-submitBtn.addEventListener('click', handleAnswerSubmit);
-
-answerInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    handleAnswerSubmit();
-  }
-});
-
-// --- 管理画面モーダル ---
+// --- 画像カードのクリックで回答を確定 ---\n\n// --- 管理画面モーダル ---
 function openAdminModal() {
   isPaused = true;
   pauseDynamicBGM();
@@ -1078,7 +1162,7 @@ function closeAdminModal() {
   resumeDynamicBGM();
   document.getElementById('admin-modal').classList.add('hidden');
   if (gameStarted && !isTransitioning) {
-    document.getElementById('answer-input').focus();
+    
   }
 }
 
