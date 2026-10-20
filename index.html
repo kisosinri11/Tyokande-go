@@ -400,19 +400,15 @@
       text-shadow: none;
     }
     .question-title.highlight-first-question {
-      flex: 1 1 100%;
-      font-size: clamp(28px, 4vw, 46px) !important;
+      font-size: clamp(21px, 2.4vw, 30px);
       font-weight: 900;
-      line-height: 1.18;
-      color: #101010;
-      background: linear-gradient(135deg, #fff700 0%, #ffbd00 100%);
-      border: 5px solid #ffffff;
-      border-left: 12px solid #ff3b30;
-      padding: 18px 20px;
-      border-radius: 10px;
-      text-shadow: 2px 2px 0 rgba(255,255,255,.45);
-      box-shadow: 0 0 0 4px #ffbd00, 0 8px 0 rgba(0,0,0,.65);
-      letter-spacing: .02em;
+      color: #fff36b;
+      background: linear-gradient(90deg, rgba(0, 65, 82, 0.98), rgba(0, 28, 42, 0.9));
+      border: 2px solid #fff36b;
+      border-left: 7px solid #fff36b;
+      padding: 10px 12px;
+      border-radius: 4px;
+      text-shadow: 2px 2px 0 #000;
     }
     .header-controls { display: flex; gap: 8px; }
     .btn-small {
@@ -858,7 +854,6 @@
       .ui-layer { padding:3px 5px 5px; gap:3px; }
       .header-bar { padding:3px 5px; gap:3px; }
       .question-title { font-size:12px; line-height:1.2; }
-      .question-title.highlight-first-question { font-size: clamp(21px, 6.5vw, 28px) !important; line-height: 1.16; padding: 10px 8px; }
       .stage-badges { gap:2px; margin-top:0; }
       .badge { width:21px; height:21px; min-width:21px; font-size:10px; }
       #choice-grid { width:min(68%,560px); top:53%; gap:3px; }
@@ -907,11 +902,9 @@
     .question-title { font-size: 22px; line-height: 1.35; font-weight: 700; }
     @media (max-width: 600px) {
       .question-title { font-size: clamp(17px, 4.7vw, 21px) !important; line-height: 1.3; }
-      .question-title.highlight-first-question { font-size: clamp(25px, 7vw, 36px) !important; line-height: 1.18; padding: 14px 12px; border-width: 4px; border-left-width: 9px; }
     }
     @media (max-width: 600px) and (orientation: landscape) {
       .question-title { font-size: clamp(14px, 2.8vw, 17px) !important; line-height: 1.2; }
-      .question-title.highlight-first-question { font-size: clamp(23px, 6vw, 31px) !important; line-height: 1.18; padding: 12px 10px; }
     }
     @media (prefers-reduced-motion: reduce) {
       .header-bar, #choice-grid { transition: none !important; }
@@ -1026,7 +1019,9 @@
     <div>
       <div class="header-bar interactive">
         <div class="question-title" id="header-area-indicator">【エリア1】この画像から受ける印象は？</div>
-        <div class="header-controls" style="display:none"></div>
+        <div class="header-controls">
+          <button class="btn-small" id="admin-btn">⚙ 管理設定</button>
+        </div>
       </div>
       <div class="stage-badges" id="badges-container"></div>
     </div>
@@ -1944,7 +1939,7 @@ function closeAdminModal() {
   }
 }
 
-document.getElementById('admin-btn')?.addEventListener('click', openAdminModal);
+document.getElementById('admin-btn').addEventListener('click', openAdminModal);
 document.getElementById('admin-close-btn').addEventListener('click', closeAdminModal);
 document.getElementById('admin-logout-btn').addEventListener('click', closeAdminModal);
 
