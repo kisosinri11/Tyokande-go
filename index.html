@@ -385,22 +385,34 @@
       box-shadow: 6px 6px 0px #000;
     }
     .question-title {
-      /* 問題文をひと目で認識できるよう、文字と背景を強調 */
       flex: 1;
       min-width: 0;
-      font-size: clamp(20px, 2.1vw, 28px);
-      font-weight: 900;
+      font-size: 16px;
+      font-weight: 400;
       line-height: 1.3;
       white-space: pre-line;
       overflow-wrap: anywhere;
-      color: #fff36b;
-      background: linear-gradient(90deg, rgba(0, 65, 82, 0.98), rgba(0, 28, 42, 0.9));
-      border: 2px solid #fff36b;
-      border-left: 7px solid #fff36b;
-      border-radius: 5px;
-      padding: 9px 12px;
-      text-shadow: 2px 2px 0px #000;
-      box-shadow: 3px 3px 0 #000;
+      color: #fff;
+      background: transparent;
+      border: 0;
+      padding: 0;
+      border-radius: 0;
+      text-shadow: none;
+    }
+    .question-title.highlight-first-question {
+      flex: 1 1 100%;
+      font-size: clamp(28px, 4vw, 46px) !important;
+      font-weight: 900;
+      line-height: 1.18;
+      color: #101010;
+      background: linear-gradient(135deg, #fff700 0%, #ffbd00 100%);
+      border: 5px solid #ffffff;
+      border-left: 12px solid #ff3b30;
+      padding: 18px 20px;
+      border-radius: 10px;
+      text-shadow: 2px 2px 0 rgba(255,255,255,.45);
+      box-shadow: 0 0 0 4px #ffbd00, 0 8px 0 rgba(0,0,0,.65);
+      letter-spacing: .02em;
     }
     .header-controls { display: flex; gap: 8px; }
     .btn-small {
@@ -846,6 +858,7 @@
       .ui-layer { padding:3px 5px 5px; gap:3px; }
       .header-bar { padding:3px 5px; gap:3px; }
       .question-title { font-size:12px; line-height:1.2; }
+      .question-title.highlight-first-question { font-size: clamp(21px, 6.5vw, 28px) !important; line-height: 1.16; padding: 10px 8px; }
       .stage-badges { gap:2px; margin-top:0; }
       .badge { width:21px; height:21px; min-width:21px; font-size:10px; }
       #choice-grid { width:min(68%,560px); top:53%; gap:3px; }
@@ -894,9 +907,11 @@
     .question-title { font-size: 22px; line-height: 1.35; font-weight: 700; }
     @media (max-width: 600px) {
       .question-title { font-size: clamp(17px, 4.7vw, 21px) !important; line-height: 1.3; }
+      .question-title.highlight-first-question { font-size: clamp(25px, 7vw, 36px) !important; line-height: 1.18; padding: 14px 12px; border-width: 4px; border-left-width: 9px; }
     }
     @media (max-width: 600px) and (orientation: landscape) {
       .question-title { font-size: clamp(14px, 2.8vw, 17px) !important; line-height: 1.2; }
+      .question-title.highlight-first-question { font-size: clamp(23px, 6vw, 31px) !important; line-height: 1.18; padding: 12px 10px; }
     }
     @media (prefers-reduced-motion: reduce) {
       .header-bar, #choice-grid { transition: none !important; }
@@ -1011,9 +1026,7 @@
     <div>
       <div class="header-bar interactive">
         <div class="question-title" id="header-area-indicator">【エリア1】この画像から受ける印象は？</div>
-        <div class="header-controls">
-          <button class="btn-small" id="admin-btn">⚙ 管理設定</button>
-        </div>
+        <div class="header-controls" style="display:none"></div>
       </div>
       <div class="stage-badges" id="badges-container"></div>
     </div>
@@ -1239,11 +1252,13 @@ function playRandomBGM(avoidCurrent = true) {
 }
 
 embeddedBgm.addEventListener('ended', () => {
-  if (gameStarted && !isPaused) playRandomBGM(true);
+  // プレイ中BGMは再生しない
 });
 
 function startDynamicBGM() {
-  playRandomBGM(true);
+  // プレイ中BGMは無音（スタート後〜ゴール直前）。効果音・ゴール演出音は維持。
+  embeddedBgm.pause();
+  embeddedBgm.currentTime = 0;
 }
 
 function stopDynamicBGM() {
@@ -1256,10 +1271,8 @@ function pauseDynamicBGM() {
 }
 
 function resumeDynamicBGM() {
-  if (gameStarted && !isPaused) {
-    const playPromise = embeddedBgm.play();
-    if (playPromise && typeof playPromise.catch === 'function') playPromise.catch(() => {});
-  }
+  // プレイ中BGMは再開しない
+  embeddedBgm.pause();
 }
 // --- ゲーム効果音（Web Audioで生成・外部ファイル不要） ---
 let sfxAudioContext = null;
@@ -1649,6 +1662,8 @@ function setupQuestionState(index) {
 
   const renderNext = () => {
     updateHeaderAndBadges();
+    const questionHeading = document.getElementById('header-area-indicator');
+    if (questionHeading) questionHeading.classList.toggle('highlight-first-question', index === 0);
     renderChoices();
     [header, grid].forEach(el => {
       if (!el) return;
@@ -1929,7 +1944,7 @@ function closeAdminModal() {
   }
 }
 
-document.getElementById('admin-btn').addEventListener('click', openAdminModal);
+document.getElementById('admin-btn')?.addEventListener('click', openAdminModal);
 document.getElementById('admin-close-btn').addEventListener('click', closeAdminModal);
 document.getElementById('admin-logout-btn').addEventListener('click', closeAdminModal);
 
