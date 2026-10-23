@@ -997,6 +997,14 @@ body { background:#f4f5f7 !important; color:#222 !important; font-family:-apple-
     #skip-question-btn:active { background: #f1f3f5; }
     #choice-grid { margin-bottom: 58px; }
   </style>
+
+<style id="start-screen-emergency-fix">
+  #start-overlay { position:fixed !important; inset:0 !important; width:100vw !important; height:100dvh !important; z-index:2147483000 !important; pointer-events:auto !important; }
+  #start-btn { position:relative !important; z-index:2147483001 !important; pointer-events:auto !important; cursor:pointer !important; }
+  #demographic-overlay { position:fixed !important; inset:0 !important; z-index:2147483002 !important; pointer-events:auto !important; }
+  #demographic-overlay[style*="display: flex"], #demographic-overlay[style*="display:flex"] { display:flex !important; }
+  #demographic-card, #demographic-start { position:relative !important; z-index:2147483003 !important; pointer-events:auto !important; }
+</style>
 </head>
 <body>
 
@@ -1009,7 +1017,7 @@ body { background:#f4f5f7 !important; color:#222 !important; font-family:-apple-
   <!-- スタート画面 -->
   <div class="start-overlay" id="start-overlay">
     <div class="start-title">表情に関する調査　基礎心理学ゼミ11班</div>
-    <button class="retro-btn" id="start-btn">はじめる</button>
+    <button class="retro-btn" id="start-btn" type="button">はじめる</button>
   </div>
 
   <!-- プレイ前アンケート -->
@@ -1027,7 +1035,7 @@ body { background:#f4f5f7 !important; color:#222 !important; font-family:-apple-
         <option value="回答しない">回答しない</option>
         <option value="0歳">0歳</option><option value="1歳">1歳</option><option value="2歳">2歳</option><option value="3歳">3歳</option><option value="4歳">4歳</option><option value="5歳">5歳</option><option value="6歳">6歳</option><option value="7歳">7歳</option><option value="8歳">8歳</option><option value="9歳">9歳</option><option value="10歳">10歳</option><option value="11歳">11歳</option><option value="12歳">12歳</option><option value="13歳">13歳</option><option value="14歳">14歳</option><option value="15歳">15歳</option><option value="16歳">16歳</option><option value="17歳">17歳</option><option value="18歳">18歳</option><option value="19歳">19歳</option><option value="20歳">20歳</option><option value="21歳">21歳</option><option value="22歳">22歳</option><option value="23歳">23歳</option><option value="24歳">24歳</option><option value="25歳">25歳</option><option value="26歳">26歳</option><option value="27歳">27歳</option><option value="28歳">28歳</option><option value="29歳">29歳</option><option value="30歳">30歳</option><option value="31歳">31歳</option><option value="32歳">32歳</option><option value="33歳">33歳</option><option value="34歳">34歳</option><option value="35歳">35歳</option><option value="36歳">36歳</option><option value="37歳">37歳</option><option value="38歳">38歳</option><option value="39歳">39歳</option><option value="40歳">40歳</option><option value="41歳">41歳</option><option value="42歳">42歳</option><option value="43歳">43歳</option><option value="44歳">44歳</option><option value="45歳">45歳</option><option value="46歳">46歳</option><option value="47歳">47歳</option><option value="48歳">48歳</option><option value="49歳">49歳</option><option value="50歳">50歳</option><option value="51歳">51歳</option><option value="52歳">52歳</option><option value="53歳">53歳</option><option value="54歳">54歳</option><option value="55歳">55歳</option><option value="56歳">56歳</option><option value="57歳">57歳</option><option value="58歳">58歳</option><option value="59歳">59歳</option><option value="60歳">60歳</option><option value="61歳">61歳</option><option value="62歳">62歳</option><option value="63歳">63歳</option><option value="64歳">64歳</option><option value="65歳">65歳</option><option value="66歳">66歳</option><option value="67歳">67歳</option><option value="68歳">68歳</option><option value="69歳">69歳</option><option value="70歳">70歳</option><option value="71歳">71歳</option><option value="72歳">72歳</option><option value="73歳">73歳</option><option value="74歳">74歳</option><option value="75歳">75歳</option><option value="76歳">76歳</option><option value="77歳">77歳</option><option value="78歳">78歳</option><option value="79歳">79歳</option><option value="80歳">80歳</option><option value="81歳">81歳</option><option value="82歳">82歳</option><option value="83歳">83歳</option><option value="84歳">84歳</option><option value="85歳">85歳</option><option value="86歳">86歳</option><option value="87歳">87歳</option><option value="88歳">88歳</option><option value="89歳">89歳</option><option value="90歳">90歳</option><option value="91歳">91歳</option><option value="92歳">92歳</option><option value="93歳">93歳</option><option value="94歳">94歳</option><option value="95歳">95歳</option><option value="96歳">96歳</option><option value="97歳">97歳</option><option value="98歳">98歳</option><option value="99歳">99歳</option><option value="100歳">100歳</option>
       </select>
-      <button id="demographic-start">回答を開始する</button>
+      <button id="demographic-start" type="button">回答を開始する</button>
     </div>
   </div>
 
@@ -1639,11 +1647,27 @@ function startGame() {
   loadQuestion(0);
 }
 
-// スタートボタンから最初の問題へ進む
+// スタートボタンで回答者情報を表示し、入力後に調査を開始する
 const startButton = document.getElementById('start-btn');
+const demographicOverlay = document.getElementById('demographic-overlay');
+const demographicStartButton = document.getElementById('demographic-start');
 if (startButton) {
   startButton.addEventListener('click', (event) => {
     event.preventDefault();
+    if (demographicOverlay) {
+      demographicOverlay.style.display = 'flex';
+    } else {
+      startGame();
+    }
+  });
+}
+if (demographicStartButton) {
+  demographicStartButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    if (demographicOverlay) demographicOverlay.style.display = 'none';
+    // 回答者情報は任意。選択値を保持してから調査を開始する。
+    window.respondentGender = document.getElementById('gender-select')?.value || '回答しない';
+    window.respondentAge = document.getElementById('age-select')?.value || '回答しない';
     startGame();
   });
 }
@@ -2046,6 +2070,48 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof submitAndNext === 'function') submitAndNext('選択しない');
   });
 });
+</script>
+
+<script id="start-screen-emergency-controller">
+(function () {
+  function showDemographics() {
+    var overlay = document.getElementById('demographic-overlay');
+    if (overlay) { overlay.style.setProperty('display', 'flex', 'important'); overlay.setAttribute('aria-hidden', 'false'); }
+  }
+  function beginSurvey() {
+    var gender = document.getElementById('gender-select');
+    var age = document.getElementById('age-select');
+    window.respondentGender = gender && gender.value ? gender.value : '回答しない';
+    window.respondentAge = age && age.value ? age.value : '回答しない';
+    var overlay = document.getElementById('demographic-overlay');
+    if (overlay) { overlay.style.setProperty('display', 'none', 'important'); overlay.setAttribute('aria-hidden', 'true'); }
+    var start = document.getElementById('start-overlay');
+    if (start) start.style.setProperty('display', 'none', 'important');
+    try {
+      if (typeof window.startGame === 'function') {
+        if (typeof gameStarted !== 'undefined') gameStarted = false;
+        window.startGame();
+      } else {
+        // Fallback for cases where the original script did not expose startGame.
+        var questionArea = document.getElementById('choice-grid');
+        if (questionArea) questionArea.style.display = 'grid';
+        if (typeof window.loadQuestion === 'function') window.loadQuestion(0);
+      }
+    } catch (err) {
+      console.error('調査開始エラー:', err);
+      if (start) start.style.setProperty('display', 'flex', 'important');
+      if (overlay) { overlay.style.setProperty('display', 'flex', 'important'); overlay.setAttribute('aria-hidden', 'false'); }
+      alert('調査を開始できませんでした。ページを再読み込みして、もう一度お試しください。');
+    }
+  }
+  document.addEventListener('click', function (event) {
+    var target = event.target && event.target.closest ? event.target.closest('#start-btn, #demographic-start') : null;
+    if (!target) return;
+    event.preventDefault(); event.stopPropagation();
+    if (target.id === 'start-btn') showDemographics();
+    else beginSurvey();
+  }, true);
+})();
 </script>
 </body>
 </html>
